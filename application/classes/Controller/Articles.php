@@ -51,7 +51,7 @@ class Controller_Articles extends Controller_Common {
             HTTP::redirect(URL::site());
         }
 
-        $id = $this->request->param('id');
+        $id = (int) $this->request->param('id');
 
         Model::factory('Article')->delete($id);
         HTTP::redirect(URL::site('articles'));
