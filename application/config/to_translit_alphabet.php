@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct script access');
 
 return [
-    [
+    'alpha' => [
         'а' => 'a',   'б' => 'b',   'в' => 'v',
         'г' => 'g',   'д' => 'd',   'е' => 'e',
         'ё' => 'e',   'ж' => 'zh',  'з' => 'z',

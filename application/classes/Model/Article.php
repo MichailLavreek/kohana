@@ -42,6 +42,7 @@ class Model_Article extends Model
     public function create($post)
     {
         if ($this->isValidArticle($post)) {
+            $post['message'] = strip_tags($post['message']);
             $post = $this->addSomeColumns($post);
 
             DB::insert($this->_table, ['title', 'alt_title', 'author', 'content_short', 'content_full'])
@@ -94,15 +95,15 @@ class Model_Article extends Model
     protected function addSomeColumns($post)
     {
         // Приведение заголовка в транслит
-        $alphabet = Kohana::$config->load('to_translit_alphabet')[0];
-        $str = strtr(Arr::get($post, 'title'), $alphabet);
+        $alphabet = Kohana::$config->load('to_translit_alphabet');
+        $str = strtr($post['title'], $alphabet->alpha);
         $str = strtolower($str);
         $str = preg_replace('~[^-a-z0-9_]+~u', '-', $str);
         $str = trim($str, "-");
         $str = mb_strimwidth($str, 0, 20);
 
         $post['alt_title'] = $str;
-        $post['content_short'] = mb_strimwidth(Arr::get($post, 'message'), 0, 350, '...');
+        $post['content_short'] = mb_strimwidth($post['message'], 0, 350, '...');
 
         return $post;
     }

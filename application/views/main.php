@@ -42,7 +42,7 @@
         <div class="clearing"></div>
         <div class="panel panel-default">
             <div class="panel-body">
-                2011 Все права защищены
+                2016 Все права защищены
             </div>
         </div>
     </div>

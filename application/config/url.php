@@ -2,6 +2,7 @@
 
 return [
 	'trusted_hosts' => [
-        'testsite/*'
+        //'testsite/*'
+        'lavreek-test.tk/*'
 	]
 ];
