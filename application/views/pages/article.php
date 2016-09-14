@@ -4,6 +4,7 @@
         <i>Автор: <?php echo $article['author']; ?></i> /
         <i>Дата публикации: <?php echo $article['date']; ?></i><br /><br />
         <p><?php echo $article['content_full']; ?></p>
+        <a href="<?php echo URL::site('delete-article') . '/' . $article['id'] ?>" class="del-comm-link">удалить новость</a>
     </div>
     <?php echo $comments; ?>
 <?php else: ?>

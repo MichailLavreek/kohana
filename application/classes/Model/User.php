@@ -3,10 +3,9 @@
 class Model_User extends Model
 {
     protected $_table = 'users';
-    protected $post;
+    protected $validator;
 
     /**
-     * Get comments for article
      * @return array
      */
     public function getAll()
@@ -16,11 +15,7 @@ class Model_User extends Model
             ->execute()
             ->as_array();
 
-        if ($users) {
-            return $users;
-        }
-
-        return [];
+        return $users ? $users : [];
     }
 
     /**
@@ -31,42 +26,46 @@ class Model_User extends Model
     {
         $user = DB::select()
             ->from($this->_table)
-            ->where('id', '=', $id)
+            ->where('id', '=', ':id')
+            ->param(':id', $id)
             ->execute()
             ->as_array();
 
-        if ($user) {
-            return $user[0];
-        }
-
-        return [];
+        return $user ? $user[0] : [];
     }
 
     /**
-     * Create new comment
-     * @internal param $name
-     * @internal param $email
-     * @internal param $pass
-     * @internal param string $status
+     * @param array $post
+     * @return array|mixed
      */
-    public function createUser()
+    public function create(array $post)
     {
-        DB::insert($this->_table, ['name', 'email', 'pass', 'status'])
-            ->values([
-                Arr::get($_POST, 'name'),
-                Arr::get($_POST, 'email'),
-                Arr::get($_POST, 'pass'),
-                'user'
-            ])
-            ->execute();
+        if ($this->isValidUser($post)) {
+            DB::insert($this->_table, ['name', 'email', 'pass', 'status'])
+                ->values([':name', ':email', ':pass', ':status'])
+                ->parameters([
+                    ':name' => Arr::get($post, 'name'),
+                    ':email' => Arr::get($post, 'email'),
+                    ':pass' => Arr::get($post, 'pass'),
+                    ':status' => 'user'
+                ])
+                ->execute();
+
+            return [];
+        } else {
+            return $this->getValidationErrors();
+        }
     }
 
     /**
      * @param $id
      */
-    public function deleteUser($id)
+    public function delete($id)
     {
-        DB::delete($this->_table)->where('id', '=', $id)->execute();
+        DB::delete($this->_table)
+            ->where('id', '=', ':id')
+            ->param(':id', $id)
+            ->execute();
     }
 
     /**
@@ -77,7 +76,6 @@ class Model_User extends Model
         $user = $this->getById($id);
 
         if ($user) {
-            var_dump($user);
             if ($user['status'] == 'user') {
                 $value = 'blocked';
             } else {
@@ -86,52 +84,57 @@ class Model_User extends Model
 
             DB::update($this->_table)
                 ->value('status', $value)
-                ->where('id', '=', $id)
+                ->where('id', '=', ':id')
+                ->param(':id', $id)
                 ->execute();
         }
     }
 
     /**
+     * @param array $post
      * @return bool
      */
-    public function isValid()
+    public function isValidUser(array $post)
     {
-        $this->post = Validation::factory($_POST)
+        $this->validator = Validation::factory($post)
             ->rule(true, 'not_empty')
-            ->rule('name', 'max_length', [':value', 20])
+            ->rule('name', 'max_length', [':value', 30])
             ->rule('name', 'alpha_numeric')
             ->rule('email', 'email')
+            ->rule('email', 'max_length', [':value', 100])
             ->rule('pass', 'min_length', [':value', 8])
+            ->rule('pass', 'max_length', [':value', 100])
             ->rule('pass2', 'matches', [':validation', ':field', 'pass']);
 
-        if (!$this->unique_username(Arr::get($_POST, 'name'))) {
-            $this->post->error('name', 'matches');
+        if ($this->validator->check() && !$this->isUniqueUsername(Arr::get($post, 'name'))) {
+            $this->validator->error('name', 'matches');
             return false;
         }
 
-        return $this->post->check();
+        return $this->validator->check();
     }
 
-    public function unique_username($name)
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function isUniqueUsername($name)
     {
          $match = DB::select()
-            ->from('users')
-            ->where('name', '=', $name)
-            ->execute()
-            ->as_array();
+             ->from('users')
+             ->where('name', '=', ':name')
+             ->param(':name', $name)
+             ->execute()
+             ->as_array();
 
-        if ($match) {
-            return false;
-        }
-
-        return true;
+        return $match ? false : true;
     }
 
     /**
      * @return mixed
      */
-    public function getErrors()
+    public function getValidationErrors()
     {
-        return $this->post->errors();
+        return $this->validator->errors();
     }
 }

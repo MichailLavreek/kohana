@@ -2,8 +2,7 @@
 
 return array
 (
-    'default' => array
-    (
+    'default' => [
             'type'       => 'PDO',
             'connection' => array(
                 'dsn'        => 'mysql:host=localhost;dbname=testsite',
@@ -19,5 +18,5 @@ return array
         'table_prefix' => '',
         'charset'      => 'utf8',
         'caching'      => FALSE,
-    ),
+    ],
 );

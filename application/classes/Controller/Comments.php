@@ -8,25 +8,32 @@ class Controller_Comments extends Controller {
             HTTP::redirect(URL::site());
         }
 
+        $commentModel = Model::factory('Comment');
         $article_id = $this->request->param('id');
 
-        $content = View::factory('/comments/show')
-            ->bind('comments', $comments)
-            ->bind('errors', $errors);
-
         if($_POST) {
-            $post = Model::factory('Comment');
-            if ($post->isValid()) {
-                Model::factory('Comment')
-                    ->create_comment($article_id, Arr::get($_POST, 'user'), Arr::get($_POST, 'message'));
-            } else {
-                $errors = $post->getErrors();
-            }
+            $result = $commentModel->create($article_id, $_POST);
         }
 
-        $comments = Model::factory('Comment')->get_comments($article_id);
+        $comments = $commentModel->getById($article_id);
+
+        $content = View::factory('/comments/show')
+            ->set('comments', $comments)
+            ->bind('errors', $result);
 
         $this->response->body($content);
     }
 
-} // Comments
+    public function action_deleteComment()
+    {
+        /* Перенаправление на главную, если запрос пришел не со страницы статьи нашего сайта */
+        if (!isset($_SERVER['HTTP_REFERER']) || !stristr($_SERVER['HTTP_REFERER'], URL::site('articles'))) {
+            HTTP::redirect(URL::site());
+        }
+
+        $id = $this->request->param('id');
+        Model::factory('Comment')->delete($id);
+
+        HTTP::redirect($_SERVER['HTTP_REFERER']);
+    }
+}

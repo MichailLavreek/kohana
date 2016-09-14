@@ -2,50 +2,76 @@
 
 class Model_Comment extends Model
 {
-    protected $_tableComments = 'comments';
-    protected $post;
+    protected $_table = 'comments';
+    protected $validator;
 
     /**
-     * Get comments for article
+     * @param $id
      * @return array
      */
-    public function get_comments($article_id)
+    public function getById($id)
     {
-        $query = DB::select('user', 'message')
-            ->from($this->_tableComments)
-            ->where('article_id', '=', $article_id)
+        $query = DB::select('user', 'message', 'id')
+            ->from($this->_table)
+            ->where('article_id', '=', ':id')
+            ->param(':id', $id)
             ->execute()
             ->as_array();
 
-        if ($query) {
-            return $query;
-        }
-
-        return [];
+        return $query ? $query : [];
     }
 
     /**
-     * Create new comment
+     * @param $article_id
+     * @param array $post
+     * @return mixed|null
      */
-    public function create_comment($article_id, $user, $message)
+    public function create($article_id, array $post)
     {
-        DB::insert($this->_tableComments, ['article_id', 'user', 'message'])
-            ->values([$article_id, $user, $message])
+        if ($this->isValidComment($post)) {
+            DB::insert($this->_table, ['article_id', 'user', 'message'])
+                ->values([':id', ':user', ':message'])
+                ->parameters([
+                    ':id' => $article_id,
+                    ':user' => Arr::get($post, 'user'),
+                    ':message' => Arr::get($post, 'message')
+                ])
+                ->execute();
+            return null;
+        } else {
+            return $this->getValidationErrors();
+        }
+    }
+
+    public function delete($id)
+    {
+        DB::delete($this->_table)
+            ->where('id', '=', ':id')
+            ->param(':id', $id)
             ->execute();
     }
 
-    public function isValid()
+    /**
+     * @param array $post
+     * @return bool
+     */
+    public function isValidComment(array $post)
     {
-        $this->post = Validation::factory($_POST)
+        $this->validator = Validation::factory($post)
             ->rule('user', 'not_empty')
-            ->rule('user', 'max_length', [':value', 20])
-            ->rule('message', 'not_empty');
+            ->rule('user', 'max_length', [':value', 30])
+            ->rule('message', 'not_empty')
+            ->rule('message', 'max_length', [':value', 300]);
 
-        return $this->post->check();
+
+        return $this->validator->check();
     }
 
-    public function getErrors()
+    /**
+     * @return mixed
+     */
+    public function getValidationErrors()
     {
-        return $this->post->errors();
+        return $this->validator->errors();
     }
 }

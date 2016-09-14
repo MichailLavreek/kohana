@@ -13,8 +13,5 @@ abstract class Controller_Common extends Controller_Template {
         View::set_global('title', $config['title']);
         View::set_global('description', $config['description']);
         $this->template->content = '';
-        $this->template->styles = ['main'];
-        $this->template->scripts = '';
     }
-
-} // End Common
+}

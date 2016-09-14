@@ -2,22 +2,16 @@
 
 class Controller_Users extends Controller_Common {
 
-    // Главная страница
     public function action_index()
     {
-
-        $content = View::factory('/pages/show')
+        $content = View::factory('/pages/users')
             ->bind('users', $users)
-            ->bind('errors', $errors);
+            ->bind('errors', $result);
 
         $userModel = Model::factory('User');
 
         if ($_POST) {
-            if ($userModel->isValid()) {
-                $userModel->createUser();
-            } else {
-                $errors = $userModel->getErrors();
-            }
+            $result = $userModel->create($_POST);
         }
 
         $users = $userModel->getAll();
@@ -28,7 +22,7 @@ class Controller_Users extends Controller_Common {
     public function action_deleteUser()
     {
         $id = (int) $this->request->param('id');
-        Model::factory('User')->deleteUser($id);
+        Model::factory('User')->delete($id);
 
         HTTP::redirect(URL::site());
     }

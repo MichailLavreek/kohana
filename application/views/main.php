@@ -29,6 +29,7 @@
                     <li><a href="<?php echo URL::site('about'); ?>">О сайте</a></li>
                     <li><a href="<?php echo URL::site('contacts'); ?>">Мои контакты</a></li>
                     <li><a href="<?php echo URL::site('articles'); ?>">Статьи</a></li>
+                    <li><a href="<?php echo URL::site('add-article'); ?>">Добавить статью</a></li>
                 </ul>
             </div>
         </div>

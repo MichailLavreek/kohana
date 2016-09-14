@@ -15,4 +15,4 @@ class Controller_Static extends Controller_Common {
         $this->template->content = $content;
     }
 
-} // End Static
+}

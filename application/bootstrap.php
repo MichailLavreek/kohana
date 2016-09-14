@@ -121,7 +121,7 @@ Kohana::$config->attach(new Config_File);
 /**
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
-Kohana::modules(array(
+Kohana::modules([
 	 //'auth'       => MODPATH.'auth',       // Basic authentication
 	 'cache'      => MODPATH.'cache',      // Caching with multiple backends
 	 //'codebench'  => MODPATH.'codebench',  // Benchmarking tool
@@ -131,7 +131,7 @@ Kohana::modules(array(
 	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping
 	 //'unittest'   => MODPATH.'unittest',   // Unit testing
 	 'userguide'  => MODPATH.'userguide',  // User guide and API documentation
-	));
+	]);
 
 /**
  * Cookie Salt
@@ -148,49 +148,61 @@ Cookie::$salt = 'sdKVwqodsfJSDJF4jFJLs43r__(';
  */
 
 Route::set('admin', 'admin(/<controller>(/<action>(/<id>)))')
-    ->defaults(array(
+    ->defaults([
         'directory'  => 'admin',
         'controller' => 'main',
         'action'     => 'index',
-    ));
+    ]);
 
-Route::set('static', '<action>(/<id>)', array('action' => 'about|contacts'))
-    ->defaults(array(
+Route::set('static', '<action>(/<id>)', ['action' => 'about|contacts'])
+    ->defaults([
         'controller' => 'static'
-    ));
+    ]);
 
-Route::set('comments', 'comments/<id>', array('id' => '.+'))
-    ->defaults(array(
+Route::set('deleteComment', 'delete-comment/<id>', ['id' => '[0-9]+'])
+    ->defaults([
+        'controller' => 'comments',
+        'action'     => 'deleteComment',
+    ]);
+
+Route::set('comments', 'comments/<id>', ['id' => '[0-9]+'])
+    ->defaults([
         'controller' => 'comments',
         'action'     => 'index',
-    ));
+    ]);
 
-//Route::set('html', '<path>.html',  array('path' => '[a-zA-Z0-9_/]+',))
-//    ->defaults(array(
-//        'controller' => 'static',
-//        'action' => 'index',
-//    ));
+Route::set('addArticle', 'add-article')
+    ->defaults([
+        'controller' => 'articles',
+        'action'     => 'addArticle',
+    ]);
 
-Route::set('articles', '<articles>/<id>-(<artname>)', array('id' => '[0-9]+'), array('artname' => '.+'))
-    ->defaults(array(
+Route::set('deleteArticle', 'delete-article/<id>', ['id' => '[0-9]+'])
+    ->defaults([
+        'controller' => 'articles',
+        'action'     => 'deleteArticle',
+    ]);
+
+Route::set('articles', 'articles/<id>-(<artname>)', ['id' => '[0-9]+', 'artname' => '.+'])
+    ->defaults([
         'controller' => 'articles',
         'action'     => 'article',
-    ));
+    ]);
 
 Route::set('userDel', 'delete-user/<id>')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'users',
         'action'     => 'deleteUser',
-    ));
+    ]);
 
 Route::set('userChStatus', 'change-status-user/<id>')
-    ->defaults(array(
+    ->defaults([
         'controller' => 'users',
         'action'     => 'changeStatus',
-    ));
+    ]);
 
 Route::set('default', '(<controller>(/<action>(/<id>)))')
-	->defaults(array(
+	->defaults([
 		'controller' => 'users',
 		'action'     => 'index',
-	));
+	]);
