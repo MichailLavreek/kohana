@@ -31,7 +31,7 @@ class Controller_Comments extends Controller {
             HTTP::redirect(URL::site());
         }
 
-        $id = (int) $this->request->param('id');
+        $id = $this->request->param('id');
         Model::factory('Comment')->delete($id);
 
         HTTP::redirect($_SERVER['HTTP_REFERER']);

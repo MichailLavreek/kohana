@@ -21,7 +21,7 @@ class Controller_Users extends Controller_Common {
 
     public function action_deleteUser()
     {
-        $id = (int) $this->request->param('id');
+        $id = $this->request->param('id');
         Model::factory('User')->delete($id);
 
         HTTP::redirect(URL::site());
@@ -29,7 +29,7 @@ class Controller_Users extends Controller_Common {
 
     public function action_changeStatus()
     {
-        $id = (int) $this->request->param('id');
+        $id = $this->request->param('id');
         Model::factory('User')->changeStatus($id);
 
         HTTP::redirect(URL::site());
